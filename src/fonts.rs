@@ -7,6 +7,22 @@ use eframe::egui::{FontData, FontDefinitions, FontFamily};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+/// Normalizes fontconfig's `%{index}` value into a TrueType Collection (`.ttc`) face index.
+/// Fontconfig encodes variable-font named-instance indices in bits 16..31 (e.g. `0x0007_0000`
+/// for NotoSans[wght].ttf Bold), which causes `ttf-parser` / `ab_glyph` to panic with `InvalidFont`
+/// unless masked out.
+fn normalize_face_index(path: &Path, raw_index: u32) -> u32 {
+    let is_ttc = path
+        .extension()
+        .and_then(|e| e.to_str())
+        .is_some_and(|e| e.eq_ignore_ascii_case("ttc"));
+    if is_ttc {
+        raw_index & 0xFFFF
+    } else {
+        0
+    }
+}
+
 /// Finds the best matching font file and face index (for TTC) for a pattern via fontconfig.
 fn fc_match(pattern: &str) -> Option<(PathBuf, u32)> {
     let out = Command::new("fc-match")
@@ -19,7 +35,8 @@ fn fc_match(pattern: &str) -> Option<(PathBuf, u32)> {
     let text = String::from_utf8_lossy(&out.stdout);
     let mut lines = text.lines();
     let file = PathBuf::from(lines.next()?.trim());
-    let index = lines.next().and_then(|i| i.trim().parse().ok()).unwrap_or(0);
+    let raw_index = lines.next().and_then(|i| i.trim().parse().ok()).unwrap_or(0);
+    let index = normalize_face_index(&file, raw_index);
     is_usable(&file).then_some((file, index))
 }
 
@@ -188,6 +205,14 @@ mod tests {
     fn test_is_usable_rejects_bitmap_formats() {
         assert!(!is_usable(Path::new("/nonexistent/font.pcf.gz")));
         assert!(!is_usable(Path::new("/nonexistent/font.ttf")));
+    }
+
+    #[test]
+    fn test_normalize_face_index_masks_variable_font_bits() {
+        let vf = Path::new("/usr/share/fonts/google-noto-vf/NotoSans[wght].ttf");
+        assert_eq!(normalize_face_index(vf, 0x0007_0000), 0);
+        let ttc = Path::new("/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc");
+        assert_eq!(normalize_face_index(ttc, 0x0003_0002), 2);
     }
 
     /// Verifies that egui can actually lay out text when system fonts are present
