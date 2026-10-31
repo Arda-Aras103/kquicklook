@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=KQuickLook
+GenericName=Quick File Previewer
+Comment=Lightweight macOS QuickLook-style file previewer for KDE Plasma and Dolphin
+Exec=kquicklook %f
+Icon=document-preview
+Terminal=false
+NoDisplay=true
+Categories=Utility;KDE;Qt;
+MimeType=all/all;inode/directory;
+StartupNotify=false

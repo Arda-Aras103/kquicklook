@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Service
+MimeType=all/all;inode/directory;
+Actions=QuickLookPreview;
+X-KDE-Priority=TopLevel
+
+[Desktop Action QuickLookPreview]
+Name=Quick Preview (KQuickLook)
+Icon=document-preview
+Exec=kquicklook %f

@@ -1,0 +1,14 @@
+# Rust / Cargo build artifacts
+/target/
+target/
+**/*.rs.bk
+
+# Editor & OS files
+*.swp
+*~
+.DS_Store
+.idea/
+.vscode/
+
+# Backup files
+*.kquicklook-backup

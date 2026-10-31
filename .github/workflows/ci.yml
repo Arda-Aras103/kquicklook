@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-and-test:
+    name: Build & Test (Fedora)
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    steps:
+      - name: Install Fedora build & runtime dependencies
+        run: |
+          dnf install -y gcc cargo rust rustfmt clippy fontconfig google-noto-sans-vf-fonts tar rpm
+      - uses: actions/checkout@v4
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Lint with Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Run unit tests
+        run: cargo test
+      - name: Build release binary
+        run: cargo build --release
