@@ -31,15 +31,6 @@ echo "======================================================"
 echo "  KQuickLook - KDE Plasma Installer Script (Rust)     "
 echo "======================================================"
 
-if ! command -v cargo >/dev/null 2>&1; then
-    echo "ERROR: 'cargo' (Rust compiler) not found."
-    if command -v dnf >/dev/null 2>&1; then
-        echo "Install on Fedora KDE with:"
-        echo "  sudo dnf install -y cargo rust poppler-utils ffmpeg-free wl-clipboard"
-    fi
-    exit 1
-fi
-
 if command -v dnf >/dev/null 2>&1; then
     missing_opt=()
     command -v pdftoppm >/dev/null 2>&1 || missing_opt+=("poppler-utils")
@@ -51,11 +42,23 @@ if command -v dnf >/dev/null 2>&1; then
     fi
 fi
 
-echo "[1/6] Building KQuickLook (release)..."
-cargo build --release
-
 mkdir -p "$BIN_DIR"
-install -m 755 target/release/kquicklook "$BIN_DIR/kquicklook"
+if [ -x "./kquicklook" ] && [ ! -d "src" ]; then
+    echo "[1/6] Using prebuilt KQuickLook binary from release archive..."
+    install -m 755 ./kquicklook "$BIN_DIR/kquicklook"
+else
+    if ! command -v cargo >/dev/null 2>&1; then
+        echo "ERROR: 'cargo' (Rust compiler) not found."
+        if command -v dnf >/dev/null 2>&1; then
+            echo "Install on Fedora KDE with:"
+            echo "  sudo dnf install -y cargo rust poppler-utils ffmpeg-free wl-clipboard"
+        fi
+        exit 1
+    fi
+    echo "[1/6] Building KQuickLook (release)..."
+    cargo build --release
+    install -m 755 target/release/kquicklook "$BIN_DIR/kquicklook"
+fi
 echo "[2/6] Binary installed: $BIN_DIR/kquicklook ($(du -h "$BIN_DIR/kquicklook" | cut -f1))"
 
 # Dolphin context menu (Plasma 6) and desktop application entry
