@@ -48,7 +48,11 @@ fn any_font_in(dirs: &[&str]) -> Option<(PathBuf, u32)> {
         if depth == 0 {
             return None;
         }
-        let mut entries: Vec<_> = std::fs::read_dir(dir).ok()?.flatten().map(|e| e.path()).collect();
+        let mut entries: Vec<_> = std::fs::read_dir(dir)
+            .ok()?
+            .flatten()
+            .map(|e| e.path())
+            .collect();
         entries.sort();
         for p in &entries {
             if is_usable(p) {

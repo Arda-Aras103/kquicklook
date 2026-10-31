@@ -117,7 +117,9 @@ fn main() -> eframe::Result<()> {
 
     // Discover system fonts before opening the window (no fonts embedded in the binary)
     let Some(font_defs) = fonts::system_font_definitions() else {
-        eprintln!("KQuickLook: No usable TTF/OTF font found on the system (fontconfig / fc-match).");
+        eprintln!(
+            "KQuickLook: No usable TTF/OTF font found on the system (fontconfig / fc-match)."
+        );
         std::process::exit(1);
     };
 

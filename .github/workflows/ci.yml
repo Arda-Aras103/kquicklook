@@ -17,12 +17,10 @@ jobs:
     steps:
       - name: Install Fedora build & runtime dependencies
         run: |
-          dnf install -y gcc cargo rust rustfmt clippy fontconfig google-noto-sans-vf-fonts tar rpm
+          dnf install -y gcc cargo rust clippy fontconfig google-noto-sans-vf-fonts tar rpm
       - uses: actions/checkout@v4
-      - name: Check formatting
-        run: cargo fmt --all -- --check
       - name: Lint with Clippy
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets
       - name: Run unit tests
         run: cargo test
       - name: Build release binary

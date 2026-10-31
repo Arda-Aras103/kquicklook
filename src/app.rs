@@ -415,9 +415,9 @@ impl eframe::App for QuickLookApp {
                     let title_label = ui.add(
                         egui::Label::new(
                             RichText::new(&self.metadata.file_name)
-                            .strong()
-                            .size(15.0)
-                            .color(Color32::from_rgb(239, 240, 241)),
+                                .strong()
+                                .size(15.0)
+                                .color(Color32::from_rgb(239, 240, 241)),
                         )
                         .sense(egui::Sense::click_and_drag()),
                     );
@@ -728,7 +728,8 @@ impl QuickLookApp {
 
                     if let Some(tex) = &self.texture {
                         let size = tex.size_vec2();
-                        let max_w = (ui.available_width() - 24.0).min(if is_vid { 780.0 } else { 520.0 });
+                        let cap_w = if is_vid { 780.0 } else { 520.0 };
+                        let max_w = (ui.available_width() - 24.0).min(cap_w);
                         let max_h = (ui.available_height() * if is_vid { 0.68 } else { 0.50 })
                             .min(if is_vid { 440.0 } else { 320.0 });
                         let scale = (max_w / size.x).min(max_h / size.y).min(1.0);
@@ -757,7 +758,8 @@ impl QuickLookApp {
                             .inner_margin(egui::Margin::symmetric(12.0, 6.0))
                             .show(ui, |ui| {
                                 ui.horizontal(|ui| {
-                                    let play_label = if player.paused { "▶ Play" } else { "⏸ Pause" };
+                                    let play_label =
+                                        if player.paused { "▶ Play" } else { "⏸ Pause" };
                                     if ui
                                         .button(RichText::new(play_label).strong().size(13.0))
                                         .clicked()
@@ -772,7 +774,8 @@ impl QuickLookApp {
                                         player.seek(player.position + 5.0);
                                     }
 
-                                    let mute_label = if player.muted { "🔇 Muted" } else { "🔊 Audio" };
+                                    let mute_label =
+                                        if player.muted { "🔇 Muted" } else { "🔊 Audio" };
                                     if ui.button(mute_label).clicked() {
                                         player.toggle_mute();
                                     }
