@@ -52,12 +52,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
           TAG="${GITHUB_REF_NAME}"
           if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
             TAG="${{ github.event.inputs.tag }}"
           fi
-          gh release view "${TAG}" >/dev/null 2>&1 || \
+          gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
             gh release create "${TAG}" \
+              --repo "${GITHUB_REPOSITORY}" \
               kquicklook-*-fedora-x86_64.tar.gz \
               kquicklook-linux-x86_64 \
               SHA256SUMS.txt \
